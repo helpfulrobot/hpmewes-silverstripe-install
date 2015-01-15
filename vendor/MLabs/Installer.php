@@ -21,10 +21,13 @@ class Installer {
         exec("chown www-data:www-data ../ -R");
         $event->getIO()->write(":: make domain readable for www");
         
-        $event->getIO()->write(":: run http://[domain]/install.php when done type [yes] here");
-        
-        exec("sake dev/build \"flush=1\"");
-        $event->getIO()->write(":: build database and flush cache");
+        if($event->getIO()->write(":: run http://[domain]/install.php when done type [yes] here") === true) {        
+            exec("sake dev/build \"flush=1\"");
+            $event->getIO()->write(":: build database and flush cache");
+        }
+        else {
+            $event->getIO()->write(":: shut down the installer...");
+        }
         
         $event->getIO()->write(":: mlabs installer tasks done...");
     }
