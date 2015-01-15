@@ -21,7 +21,7 @@ class Installer {
         exec("chown www-data:www-data ../ -R");
         $event->getIO()->write(":: make domain readable for www");
         
-        if($event->getIO()->write(":: run http://[domain]/install.php when done type [yes] here") === true) {        
+        if($event->getIO()->askConfirmation(":: run http://[domain]/install.php when done type [yes] here", false) === true) {
             exec("sake dev/build \"flush=1\"");
             $event->getIO()->write(":: build database and flush cache");
         }
