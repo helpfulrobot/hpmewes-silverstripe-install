@@ -1,0 +1,44 @@
+{
+    "name": "hpmewes/silverstripe-install",
+    "description": "MLabs SilverStripe Framework Installer",
+    "type": "silverstripe-module",
+    "keywords": ["silverstripe","image gallery","gallery"],
+    "authors": [
+        {
+            "name": "MLabs Development and Design",
+            "email": "info@mlaboratories.de",
+            "homepage": "http://mlaboratories.de"
+        },
+        {
+            "name": "Mewes Hans-Peter",
+            "email": "meweshp@googlemail.com"
+        }
+    ],
+    "repositories": [
+        {
+        "type": "vcs",
+        "url": "git@github.com:hpmewes/silverstripe-gallery.git"
+        },
+        {
+        "type": "vcs",
+        "url": "git@github.com:hpmewes/silverstripe-googlemaps.git"
+        },
+        {
+        "type": "vcs",
+        "url": "git@github.com:hpmewes/silverstripe-facebookconnect.git"
+        }
+    ],
+    "config": {
+        "process-timeout": 600	
+    },
+    "minimum-stability": "dev",
+    "scripts": {
+        "post-update-cmd": "MLabs\\Installer::postUpdate",
+        "post-install-cmd": "MLabs\\Installer::postInstall"
+    },
+    "autoload": {
+        "psr-4": {
+            "MLabs\\": "src/Mlabs/"
+        }
+    }
+}
