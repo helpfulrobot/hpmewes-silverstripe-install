@@ -2,7 +2,7 @@
     "name": "hpmewes/silverstripe-install",
     "description": "MLabs SilverStripe Framework Installer",
     "type": "silverstripe-module",
-    "keywords": ["silverstripe","image gallery","gallery"],
+    "keywords": ["silverstripe","installer","install"],
     "authors": [
         {
             "name": "MLabs Development and Design",
