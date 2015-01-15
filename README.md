@@ -6,5 +6,11 @@ composer create-project hpmewes/silverstripe-install -s dev installer.mlaborator
 
 Bevore fork ask @meweshp@googlemail.com
 
+## Webserver Support
+* Nginx
+
+## Server Management Panel Support
+* Froxlor
+
 ## Future Features
 * add addons from admin
