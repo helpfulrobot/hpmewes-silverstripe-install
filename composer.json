@@ -41,7 +41,7 @@
         "unclecheese/bootstrap-forms": "dev-master",
         "unclecheese/kickassets":"dev-master",
         "gdmedia/silverstripe-frontend-admin": "dev-master",
-        "jonom/silverstripe-focuspoint": "1.*@dev",
+        "jonom/focuspoint": "dev-master",
         "hpmewes/silverstripe-siteconfigextension": "dev-master",
         "hpmewes/silverstripe-gallery": "1.*@dev",
         "hpmewes/silverstripe-facebookconnect": "dev-master",
