@@ -1,7 +1,7 @@
 {
     "name": "hpmewes/silverstripe-install",
     "description": "MLabs SilverStripe Framework Installer",
-    "version": "0.0.1",
+    "version": "0.1",
     "require": {
         "hpmewes/silverstripe-install": "dev-master"
     },
