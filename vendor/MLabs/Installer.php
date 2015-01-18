@@ -106,6 +106,7 @@ class Installer {
         else {
             // run build only in update mode
             self::build();
+            exec("rm install.php");
         }
         
         self::$event->getIO()->write(":: mlabs installer tasks done...");
@@ -186,7 +187,10 @@ class Installer {
      * build and flush silverstripe cms
      */
     protected static function build() {
-        passthru("sake dev/build \"flush=all\"");
+        // build database
+        passthru('sake dev/build');
+        // flush template cache
+        passthru('sake "flush=all"');
         self::$event->getIO()->write(":: build database and flush cache");
     }
     
@@ -212,7 +216,6 @@ class Installer {
         self::fileReplaceContent(self::$silverstripe_environment, '[database_username]', self::$database_username);
         self::fileReplaceContent(self::$silverstripe_environment, '[database_password]', self::$database_password);
         self::fileReplaceContent(self::$silverstripe_environment, '[environment_type]', self::$environment_type);
-        self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_username]', self::$default_admin_password);
         self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_username]', self::$default_admin_username);
         self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_password]', self::$default_admin_password);
         self::fileReplaceContent(self::$silverstripe_environment, '[domain]', self::$domain);
