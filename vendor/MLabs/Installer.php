@@ -42,7 +42,8 @@ class Installer {
     private static $domain              = "[domain]";              // domain for project
     private static $froxlor_username    = "[froxlor_username]";    // client username in froxlor
 
-    private static $event = null;
+    private static $event   = null;
+    private static $status  = null;
     
     public static function postUpdate(Event $event) {
         self::$event = $event;
@@ -86,6 +87,7 @@ class Installer {
             
             // before all other tasks can run silverstripe must installed via browser install.php
             // in framework/dev/install.php is a command install as argument via commandline check if installer can run via cli
+            // in case can be that sake dev/build is the same... in config only theme and language must be setted check plz
             if(!self::$event->getIO()->askConfirmation(":: run http://[domain]/install.php when done type [yes] here (let empty for abort): ", false)) {
                 self::exitInstaller(':: mlabs installer abort');
             }
@@ -97,17 +99,12 @@ class Installer {
             self::requirementsCDNBootstrap();
             self::addMeta();
             
-            // rename installer.php
-            exec("mv install.php _install.php");
-            self::$event->getIO()->write(":: move silverstripe installers files and folders");
-            
             self::resetUserRights();
         }
-        else {
-            // run build only in update mode
-            self::build();
-            exec("rm install.php");
-        }
+        self::build();
+        // rename installer.php
+        exec("mv install.php _install.php");
+        self::$event->getIO()->write(":: move silverstripe installer");
         
         self::$event->getIO()->write(":: mlabs installer tasks done...");
     }
@@ -121,7 +118,7 @@ class Installer {
      * get config information from command line
      */
     protected static function getConfigFromCommandline() {
-        self::$domain = self::$event->getIO()->ask(":: type the domain here (let empty for default placeholder [domain]): ", "[domain]");
+        self::$domain = self::$event->getIO()->ask(":: type the domain here without http:// or https:// (let empty for default placeholder [domain]): ", "[domain]");
         self::$froxlor_username = self::$event->getIO()->ask(":: type the client username which added to froxlor here (let empty for default placeholder [froxlor-username]): ", "[froxlor-username]");
         self::$database_server = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [localhost]): ", "localhost");
         self::$database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
@@ -188,9 +185,7 @@ class Installer {
      */
     protected static function build() {
         // build database
-        passthru('sake dev/build');
-        // flush template cache
-        passthru('sake "flush=all"');
+        passthru('sake dev/build "flush=all"');
         self::$event->getIO()->write(":: build database and flush cache");
     }
     
@@ -219,7 +214,7 @@ class Installer {
         self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_username]', self::$default_admin_username);
         self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_password]', self::$default_admin_password);
         self::fileReplaceContent(self::$silverstripe_environment, '[domain]', self::$domain);
-        self::fileReplaceContent(self::$silverstripe_environment, '[root_dir_web]', '"'.self::$root_dir_web.self::$froxlor_username.'"');
+        self::fileReplaceContent(self::$silverstripe_environment, '[root_dir_web]', '"'.self::$root_dir_web.self::$froxlor_username.'/'.self::$domain.'"');
     }
 
     /**
@@ -432,7 +427,7 @@ class Installer {
                 // when search string should be replaced
                 if($replace) {
                     $linesTmp[] = str_replace($search, $content, $line);
-                    self::$event->getIO()->write(":: replaced $content with $search in $filename");
+                    self::$event->getIO()->write(":: replaced $search with $content in $filename");
                 }
                 else {
                     $linesTmp[] = $line;
