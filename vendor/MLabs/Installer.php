@@ -101,12 +101,13 @@ class Installer {
             
             self::resetUserRights();
         }
+        // check why site is not flushed and builded
         self::build();
         // rename installer.php
         exec("mv install.php _install.php");
         self::$event->getIO()->write(":: move silverstripe installer");
         
-        self::$event->getIO()->write(":: mlabs installer tasks done...");
+        self::$event->getIO()->write(":: mlabs installer tasks done run http://[domain]/dev/build?flush=all in browser builded in built has no effekt at this time...");
     }
     
     protected static function exitInstaller($message) {
