@@ -13,9 +13,6 @@ composer create-project hpmewes/silverstripe-install -s dev ROOT_SITE_DIR
 ### Install manually
 Copy files into your ROOT_SITE_DIR and run "composer install"
 
-Bevore fork ask @meweshp@googlemail.com
-Some features will be moved in other module after development. it's in still early alpha.
-
 ## Webserver Support
 
 * Nginx
@@ -53,7 +50,7 @@ If someone will help you're welcome @meweshp@googlemail.com.
 ## Todo
 
 * search in project for "Todo:"
-* $.browser is undefined in scrip.js on simple theme from silverstripe use modernizr
+* see future features, modules and so on
 
 ## Future Features (SilverStripe)
 
@@ -94,3 +91,4 @@ and some more...
 
 ## Known issues
 * "You are *required* to use the date.timezone setting or the date_default_timezone_set() function" when sake running with dev/build "flush=1°
+* $.browser is undefined in scrip.js on simple theme from silverstripe use modernizr
