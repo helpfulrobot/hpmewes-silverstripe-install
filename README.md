@@ -90,5 +90,7 @@ and some more...
 * silverstripe one click installation
 
 ## Known issues
-* "You are *required* to use the date.timezone setting or the date_default_timezone_set() function" when sake running with dev/build "flush=1°
-* $.browser is undefined in scrip.js on simple theme from silverstripe use modernizr
+* sake build/dev "flush=all" - has no effect must checked
+* "You are *required* to use the date.timezone setting or the date_default_timezone_set() function" - when sake running with dev/build "flush=1°
+* $.browser is undefined in scrip.js on simple theme from silverstripe - use modernizr
+* after installing via browser redirecting to site not found index.php/home/successfullyinstalled?flush=1&flushtoken=2f28be2e403429fbcb40b9dd3aa43d7f - i think a rule in nginx is needed
