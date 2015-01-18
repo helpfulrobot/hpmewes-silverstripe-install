@@ -33,19 +33,7 @@
         }
     ],
     "require": {
-        "silverstripe/installer": "3.1.8",
-        "silverstripe/userforms":"*",
-        "silverstripe-australia/memberprofiles":"dev-master",
-        "unclecheese/display-logic": "dev-master",
-        "unclecheese/zen-fields": "dev-master",
-        "unclecheese/bootstrap-forms": "dev-master",
-        "unclecheese/kickassets":"dev-master",
-        "gdmedia/silverstripe-frontend-admin": "dev-master",
-        "jonom/focuspoint": "dev-master",
-        "hpmewes/silverstripe-siteconfigextension": "dev-master",
-        "hpmewes/silverstripe-gallery": "1.*@dev",
-        "hpmewes/silverstripe-facebookconnect": "dev-master",
-        "hpmewes/silverstripe-googlemaps": "dev-master"
+        "silverstripe/installer": "3.1.8"
     },
     "config": {
         "process-timeout": 600	
