@@ -2,6 +2,9 @@
 Automated SilverStripe installer with cdn Bootstrap and googleapis jQuery.
 You should have root rights when you run this script.
 
+Bevore fork ask @meweshp@googlemail.com
+Some features will be moved in other module after development. it's in still early alpha.
+
 ## How to get started
 
 ### Create new project
