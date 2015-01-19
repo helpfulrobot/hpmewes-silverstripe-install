@@ -4,46 +4,73 @@ namespace MLabs;
 use Composer\Script\Event;
 
 class Installer {
-    // Todo: all configs should be external in config file
+    // Todo: all configs should be external in environment.yml file
+    /**
+     * installer settings
+     */
     private static $version                 = "0.1";
     private static $version_silverstripe    = "3.1.8";
     
-    private static $config_from = "cli";  // cli | file
+    private static $config_from = "file";  // cli | file | database
     
-    private static $project_company     = "MLabs Development and Design";
-    private static $project_adress      = "Kirchgasse 31";
-    private static $project_destination = "92360 Mühlhausen";
-    private static $project_email       = "info@mlaboratories.de";
-    private static $project_web         = "http://mlaboratories.de";
-    
-    private static $root_dir_web        = "/var/customers/webs/";       // root directory for web
+    /**
+     * silverstripe filestructure
+     * 
+     * code/forms
+     * code/extensions
+     * code/dataobjects
+     * code/controllers
+     * templates/Forms
+     */
+    private static $root_dir_code       = "mysite/code/";               // root directory of mysite
     private static $root_dir_theme      = "themes/simple/templates/";   // root directory for standard theme
-    private static $root_dir_mysite     = "mysite/code/";               // root directory of mysite
+    
+    private static $root_dir_config     = "mysite/_config/";            // root directory for config
+    private static $root_dir_vendor     = "vendor/MLabs/";              // root directory for MLabs vendor
+    
+    /**
+     * config path settings
+     */
+    private static $config_composer                 = "composer.json";              // config file for composer
+    private static $config_silverstripe             = "mysite/_config/config.yml";  // yml config file for silverstripe
+    private static $config_silverstripe_old         = "mysite/_config.php";         // php config file for silverstripe
+    private static $config_silverstripe_environment = "_ss_environment.php";        // environment settings
+    
+    /**
+     * webserver settings
+     */
+    private static $root_dir_web        = "/var/customers/webs/";       // root directory for web
     private static $root_dir_logfiles   = "/var/customers/logs/";       // root directory of mysite
-
-    private static $composer_config_json        = "composer.json";              // config file for composer
-    private static $silverstripe_config_php     = "mysite/_config.php";         // php config file for silverstripe
-    private static $silverstripe_config_yml     = "mysite/_config/config.yml";  // yml config file for silverstripe
-    private static $silverstripe_environment    = "_ss_environment.php";         // environment settings
     
     private static $owner_user_web  = "www-data";
     private static $owner_group_web = "www-data";
     
-    // environment settings
-    private static $database_server         = "localhost";
-    private static $database_name           = "[database_name]";
-    private static $database_username       = "[database_username]";
-    private static $database_password       = "[database_password]";
-    private static $environment_type        = "live";
-    private static $default_admin_username  = "admin";
-    private static $default_admin_password  = "[default_admin_password]";
+    /**
+     * silverstripe project settings
+     */
+    private static $project_company             = "MLabs Development and Design";
+    private static $project_company_adress      = "Kirchgasse 31";
+    private static $project_company_destination = "92360 Mühlhausen";
+    private static $project_company_email       = "info@mlaboratories.de";
+    private static $project_company_web         = "http://mlaboratories.de";
     
-    // these values would be asked from command line
+    // environment settings
+    private static $project_database_server   = "localhost";
+    private static $project_database_name     = "[database_name]";
+    private static $project_database_username = "[database_username]";
+    private static $project_database_password = "[database_password]";
+    private static $project_environment_type  = "live";
+    private static $default_admin_username    = "admin";
+    private static $default_admin_password    = "[default_admin_password]";
+    
     private static $domain              = "[domain]";              // domain for project
     private static $froxlor_username    = "[froxlor_username]";    // client username in froxlor
+    
+    // register your website / app https://developers.facebook.com/apps/?action=create
+    private static $facebook_app_id     = "[app_id]";       // app id of facebook app
+    private static $facebook_api_secret = "[api_secret]";   // app secret of facebook app
 
     private static $event   = null;
-    private static $status  = null;
     
     public static function postUpdate(Event $event) {
         self::$event = $event;
@@ -63,6 +90,16 @@ class Installer {
         self::$event->getIO()->write(":: mlabs installer post install done...");
     }
     
+    public static function getComposerEvent() { return self::$event; }
+    
+    public static function getRootDirCode() { return self::$root_dir_code; }
+    public static function getRootDirTheme() { return self::$root_dir_theme; }
+    public static function getRootDirConfig() { return self::$root_dir_config; }
+    public static function getRootDirVendor() { return self::$root_dir_vendor; }
+    
+    public static function getFacebookAppId() { return self::$facebook_app_id; }
+    public static function getFacebookApiSecret() { return self::$facebook_api_secret; }
+    
     /**
      * task handler with install or update mode
      * 
@@ -79,9 +116,7 @@ class Installer {
         if(!$update) {
             self::executableUserRights();
             
-            // get config
-            if(self::$config_from == "cli") self::getConfigFromCommandline();
-            else self::getConfigFromFile();
+            self::getConfig();
             // some config settings
             self::addEnvironmentSettings();
             
@@ -91,7 +126,10 @@ class Installer {
             if(!self::$event->getIO()->askConfirmation(":: run http://[domain]/install.php when done type [yes] here (let empty for abort): ", false)) {
                 self::exitInstaller(':: mlabs installer abort');
             }
+            self::createFolderStructure();
+            // add some nice addons and customized changes
             self::addRepositories();
+            // silverstripe cms changes
             self::addConfigErrorLog();
             self::addConfigEmailLog();
             self::requirementsGoogleJquery();
@@ -104,7 +142,7 @@ class Installer {
         // check why site is not flushed and builded
         self::build();
         // rename installer.php
-        exec("mv install.php _install.php");
+        File::move("install.php",  "_install.php");
         self::$event->getIO()->write(":: move silverstripe installer");
         
         self::$event->getIO()->write(":: mlabs installer tasks done run http://[domain]/dev/build?flush=all in browser builded in built has no effekt at this time...");
@@ -116,16 +154,34 @@ class Installer {
     }
 
     /**
+     * get config for installer
+     */
+    protected static function getConfig() {
+        // Todo: use a class like Config with functions like Config->get('domain') which readed from environment.yml
+        switch(self::$config_from) {
+            case "cli":
+                self::getConfigFromCommandline();
+                break;
+            case "file":
+                self::getConfigFromFile();
+                break;
+            case "database":
+                self::getConfigFromDatabase();
+                break;
+        }
+    }
+
+        /**
      * get config information from command line
      */
     protected static function getConfigFromCommandline() {
         self::$domain = self::$event->getIO()->ask(":: type the domain here without http:// or https:// (let empty for default placeholder [domain]): ", "[domain]");
         self::$froxlor_username = self::$event->getIO()->ask(":: type the client username which added to froxlor here (let empty for default placeholder [froxlor-username]): ", "[froxlor-username]");
-        self::$database_server = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [localhost]): ", "localhost");
-        self::$database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
-        self::$database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
-        self::$database_password = self::$event->getIO()->ask(":: type the database password here (let empty for default placeholder [database_password]): ", "[database_password]");
-        self::$environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [live]): ", "live");
+        self::$project_database_server = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [localhost]): ", "localhost");
+        self::$project_database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
+        self::$project_database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
+        self::$project_database_password = self::$event->getIO()->ask(":: type the database password here (let empty for default placeholder [database_password]): ", "[database_password]");
+        self::$project_environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [live]): ", "live");
         self::$default_admin_username = self::$event->getIO()->ask(":: type the default admin username here (let empty for default placeholder [admin]): ", "admin");
         self::$default_admin_password = self::$event->getIO()->ask(":: type the default admin password here (let empty for default placeholder [12345]): ", "12345");
     }
@@ -133,6 +189,11 @@ class Installer {
     protected static function getConfigFromFile() {
         // Todo:
         self::$event->getIO()->write(":: getConfigFromFile() not implemented yet");
+    }
+
+    protected static function getConfigFromDatabase() {
+        // Todo:
+        self::$event->getIO()->write(":: getConfigFromDatabase() not implemented yet");
     }
 
     /**
@@ -154,6 +215,17 @@ class Installer {
         self::$event->getIO()->write(":: make domain readable for www");      
     }
 
+    /**
+     * create a default folder structure for projects
+     */
+    protected static function createFolderStructure() {
+        exec("mkdir ".self::$root_dir_code."forms");
+        exec("mkdir ".self::$root_dir_code."extensions");
+        exec("mkdir ".self::$root_dir_code."dataobjects");
+        exec("mkdir ".self::$root_dir_code."controllers");
+        exec("mkdir ".self::$root_dir_theme."Forms");
+        self::$event->getIO()->write(":: create default folder structure for projects");
+    }
 
     /**
      * move the silverstripe-installer from vendor to project root
@@ -165,19 +237,19 @@ class Installer {
         // check if folder exists
         if(file_exists($root_dir_silverstripe_installer) && is_dir($root_dir_silverstripe_installer)) {
             // remove composer.json in silverstripe installer to avoid conflicts
-            exec("rm $root_dir_silverstripe_installer/composer.json");
+            File::delete("$root_dir_silverstripe_installer/composer.json");
             // not move folders when update is running because overwriting existing files
             if(!$update) {
                 // move folders
-                exec("mv $root_dir_silverstripe_installer/assets .");
-                exec("mv $root_dir_silverstripe_installer/mysite .");
+                File::move("$root_dir_silverstripe_installer/assets", ".");
+                File::move("$root_dir_silverstripe_installer/mysite", ".");
             }
             // move files
-            exec("mv $root_dir_silverstripe_installer/*.* .");
+            File::move("$root_dir_silverstripe_installer/*.*", ".");
             // espacially for .git .gitignore and so one
-            exec("mv $root_dir_silverstripe_installer/.* .");
+            File::move("$root_dir_silverstripe_installer/.*", ".");
             // remove the folder
-            exec("rm $root_dir_silverstripe_installer/ -R");
+            File::deleteFolder("vendor/silverstripe");
         }
     }
 
@@ -195,27 +267,30 @@ class Installer {
      */
     protected static function addRepositories() {
         foreach(Addons::getRequire() as $require) {
-            self::fileAddContent(self::$composer_config_json, $require, 'silverstripe/installer');
+            File::addContent(self::$config_composer, $require, 'silverstripe/installer');
         }
-        self::fileReplaceContent(self::$composer_config_json, '"silverstripe/installer": "3.1.8"', '"silverstripe/installer": "3.1.8",');
+        File::replaceContent(self::$config_composer, '"silverstripe/installer": "3.1.8"', '"silverstripe/installer": "3.1.8",');
         
         // run composer again which triggered Installer.php again
         passthru("composer update");
+        
+        // add some customized extensions to addons
+        Addons::addExtensions(self::$event);
     }
 
     /**
      * add some settings to __ss_environment.php for silverstripe needed to run sake
      */
     protected static function addEnvironmentSettings() {
-        self::fileReplaceContent(self::$silverstripe_environment, '[database_server]', self::$database_server);
-        self::fileReplaceContent(self::$silverstripe_environment, '[database_name]', self::$database_name);
-        self::fileReplaceContent(self::$silverstripe_environment, '[database_username]', self::$database_username);
-        self::fileReplaceContent(self::$silverstripe_environment, '[database_password]', self::$database_password);
-        self::fileReplaceContent(self::$silverstripe_environment, '[environment_type]', self::$environment_type);
-        self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_username]', self::$default_admin_username);
-        self::fileReplaceContent(self::$silverstripe_environment, '[default_admin_password]', self::$default_admin_password);
-        self::fileReplaceContent(self::$silverstripe_environment, '[domain]', self::$domain);
-        self::fileReplaceContent(self::$silverstripe_environment, '[root_dir_web]', '"'.self::$root_dir_web.self::$froxlor_username.'/'.self::$domain.'"');
+        File::replaceContent(self::$config_silverstripe_environment, '[database_server]', self::$project_database_server);
+        File::replaceContent(self::$config_silverstripe_environment, '[database_name]', self::$project_database_name);
+        File::replaceContent(self::$config_silverstripe_environment, '[database_username]', self::$project_database_username);
+        File::replaceContent(self::$config_silverstripe_environment, '[database_password]', self::$project_database_password);
+        File::replaceContent(self::$config_silverstripe_environment, '[environment_type]', self::$project_environment_type);
+        File::replaceContent(self::$config_silverstripe_environment, '[default_admin_username]', self::$default_admin_username);
+        File::replaceContent(self::$config_silverstripe_environment, '[default_admin_password]', self::$default_admin_password);
+        File::replaceContent(self::$config_silverstripe_environment, '[domain]', self::$domain);
+        File::replaceContent(self::$config_silverstripe_environment, '[root_dir_web]', '"'.self::$root_dir_web.self::$froxlor_username.'/'.self::$domain.'"');
     }
 
     /**
@@ -223,8 +298,8 @@ class Installer {
      */
     protected static function addConfigErrorLog() {
         self::$event->getIO()->write(":: add logging to Silverstripe _config.php");
-        self::fileAddContent(
-            self::$silverstripe_config_php, 
+        File::addContent(
+            self::$config_silverstripe_old, 
             "SS_Log::add_writer(new SS_LogFileWriter('".self::$root_dir_logfiles.self::$froxlor_username."-ss.log'), SS_Log::WARN, '<=');"
         );
     }
@@ -234,8 +309,8 @@ class Installer {
      */
     protected static function addConfigEmailLog() {
         self::$event->getIO()->write(":: add email logging to Silverstripe _config.php");
-        self::fileAddContent(
-            self::$silverstripe_config_php, 
+        File::addContent(
+            self::$config_silverstripe_old, 
             "SS_Log::add_writer(new SS_LogEmailWriter('admin@".self::$domain."'), SS_Log::WARN, '<=');"
         );
     }
@@ -244,8 +319,8 @@ class Installer {
      * add Requirements::block for delivered jquery to use newer version in frontend
      */
     protected static function blockRequirements() {
-        self::fileAddContent(
-            self::$root_dir_mysite.'Page.php', 
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
             "                Requirements::block(THIRDPARTY_DIR . '/jquery/jquery.js');", 
             "// See:"
         );
@@ -258,8 +333,8 @@ class Installer {
     protected static function requirementsGoogleJquery() {
         $version = self::$event->getIO()->ask(":: type jquery version here (let empty for default 2.1.1): ", "2.1.1");
         
-        self::fileAddContent(
-            self::$silverstripe_config_php, 
+        File::addContent(
+            self::$config_silverstripe_old, 
             "Requirements::javascript('http://ajax.googleapis.com/ajax/libs/jquery/$version/jquery.min.js');"
         );
     }
@@ -270,18 +345,18 @@ class Installer {
     protected static function requirementsCDNBootstrap() {
         $version = self::$event->getIO()->ask(":: type bootstrap version here (let empty for default 3.3.1): ", "3.3.1");
         
-        self::fileAddContent(
-            self::$root_dir_mysite.'Page.php', 
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
             "                Requirements::javascript('https://maxcdn.bootstrapcdn.com/bootstrap/$version/js/bootstrap.min.js');", 
             'Requirements::block'
         );
-        self::fileAddContent(
-            self::$root_dir_mysite.'Page.php', 
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
             "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/$version/css/bootstrap-theme.min.css');", 
             'Requirements::block'
         );
-        self::fileAddContent(
-            self::$root_dir_mysite.'Page.php', 
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
             "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/$version/css/bootstrap.min.css');", 
             'Requirements::block'
         );
@@ -292,12 +367,12 @@ class Installer {
      */
     protected static function addMeta() {
         // Todo: compan_* variables from command line otherwise use this one
-        self::fileAddContent(
+        File::addContent(
             self::$root_dir_theme.'Page.ss', 
-            '       <meta name="author" content="'.self::$project_company.', '.self::$project_adress.', '.self::$project_destination.', '.self::$project_web.', '.self::$project_email.'">', 
+            '       <meta name="author" content="'.self::$project_company.', '.self::$project_company_adress.', '.self::$project_company_destination.', '.self::$project_company_web.', '.self::$project_company_email.'">', 
             '<meta http-equiv'
         );
-        self::fileReplaceContent(
+        File::replaceContent(
             self::$root_dir_theme.'Page.ss',
             '$MetaTags(false)',
             '$MetaTags(true)'
@@ -311,9 +386,9 @@ class Installer {
         // change user rights to grant access from web
         exec("chmod 755 assets/ -R");
         self::$event->getIO()->write(":: make assets executable for www to upload files via Silverstripe");
-        exec("chmod 775 ".self::$silverstripe_config_php);
+        exec("chmod 775 ".self::$config_silverstripe_old);
         self::$event->getIO()->write(":: make _config.php executable for www to add some lines for installer");
-        exec("chmod 775 ".self::$silverstripe_config_yml);
+        exec("chmod 775 ".self::$config_silverstripe);
         self::$event->getIO()->write(":: make config.yml executable for www to add some lines for installer");
     }
 
@@ -322,9 +397,9 @@ class Installer {
      */
     protected static function resetUserRights() {
         // reset rights 644 for files
-        exec("chmod 644 ".self::$silverstripe_config_php);
+        exec("chmod 644 ".self::$config_silverstripe_old);
         self::$event->getIO()->write(":: reset rights for _config.php");
-        exec("chmod 644 ".self::$silverstripe_config_yml);
+        exec("chmod 644 ".self::$config_silverstripe);
         self::$event->getIO()->write(":: reset rigths config.yml");
     }
     
@@ -360,96 +435,6 @@ class Installer {
         
         exec('./framework/sake installsake');
         self::$event->getIO()->write(":: silverstripe sake was successfully installed");
-    }
-
-    /**
-     * add some content to file
-     * 
-     * @param string $filename
-     * @param string $content
-     * @param string $after is string given $content is added in a new line after $after string in file
-     */
-    private static function fileAddContent($filename, $content, $after = null) {
-        if(!is_null($after)) self::fileEditContent($filename, $content, $after);
-        else {
-            // check if file exists when add error logger
-            if(file_exists($filename)) {
-                // append content to file
-                file_put_contents($filename, $content.PHP_EOL, FILE_APPEND);
-
-                self::$event->getIO()->write(":: added $content to $filename");
-            }
-            else {
-                self::$event->getIO()->write(":: failure adding $content to $filename not exists");
-            }
-        }
-    }
-    
-    /**
-     * replace content with other content
-     * 
-     * @param string $filename
-     * @param string $search
-     * @param string $replace
-     */
-    private static function fileReplaceContent($filename, $search, $replace) {
-        self::fileEditContent($filename, $replace, $search, true);
-    }
-    
-    /**
-     * file editing
-     * 
-     * @param string $filename
-     * @param string $content
-     * @param string $search
-     * @param boolean $replace true if the given content should replace the $search string
-     */
-    private static function fileEditContent($filename, $content, $search, $replace = false) {
-        $lines      = array();
-        $linesTmp   = array();
-        $changed    = false;    // flag to set true when $search found in content
-        
-        // open file to read
-        if(($fileHandle = fopen($filename, "r")) !== false) {
-            // buffer every line
-            while(($buffer = fgets($fileHandle)) !== false) {
-                $lines[] = $buffer;
-            }
-            // close file
-            fclose($fileHandle);
-        }
-        else {
-            self::$event->getIO()->write(":: failure reading $filename perhaps not exists");
-        }
-        
-        foreach($lines as $line) {
-            // if searched string found
-            if(strpos($line, $search) !== false) {
-                // when search string should be replaced
-                if($replace) {
-                    $linesTmp[] = str_replace($search, $content, $line);
-                    self::$event->getIO()->write(":: replaced $search with $content in $filename");
-                }
-                else {
-                    $linesTmp[] = $line;
-                    $linesTmp[] = $content.PHP_EOL;
-                    self::$event->getIO()->write(":: added $content after $search to $filename");
-                }
-                
-                $changed = true;
-            } else {
-                $linesTmp[] = $line;
-            }
-        }
-        
-        // has file changed
-        if($changed) {
-            // overwrite file with new content
-            file_put_contents($filename, implode('', $linesTmp));
-        }
-        else {
-            self::$event->getIO()->write(":: not added $content to $filename because $search not found");
-        }
     }
     
 }
