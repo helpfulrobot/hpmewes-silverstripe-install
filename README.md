@@ -43,6 +43,22 @@ All included Packages are preconfigured. You should only have a look over there.
 * Memberprofiles (https://github.com/silverstripe-australia/silverstripe-memberprofiles)
 * Userforms (https://github.com/silverstripe/silverstripe-userforms)
 
+### Customized Extensions
+Use costumized Extensions without control of git.
+Some addons must be modified to get started. Now it's away. Once time you've get it run you can copy it to installer
+and in next install this would be done automated for you.
+For Example look in vendor\MLabs\Extension, vendor\MLabs\BootstrapFormExtension, vendor\MLabs\FacebookConnectExtension
+
+### File handling
+See more in File under vendor\MLabs\File
+
+* copy
+* delete
+* delete folder
+* move
+* add content
+* replace content
+
 # Dev
 Some things to do and planned in future.
 If someone will help you're welcome @meweshp@googlemail.com.
@@ -60,7 +76,10 @@ If someone will help you're welcome @meweshp@googlemail.com.
 * write nginx config
 * ssl settings to launch admin area over https://
 * write php5-fpm config (change memory_limit to 64M)
-* default contact page with userform and google map
+
+* default contact page added to cms with userform and google map
+* default member profile page added to cms with email from, relationship between registered user and group
+* default gallery template
 
 ## Future Modules (SilverStripe)
 
@@ -90,6 +109,7 @@ and some more...
 * silverstripe one click installation
 
 ## Known issues
+* BootstrapFormsExtension - not all forms are copied only BootstrapMemberProfileRegisterFrom
 * sake build/dev "flush=all" - has no effect must checked
 * "You are *required* to use the date.timezone setting or the date_default_timezone_set() function" - when sake running with dev/build "flush=1°
 * $.browser is undefined in scrip.js on simple theme from silverstripe - use modernizr
