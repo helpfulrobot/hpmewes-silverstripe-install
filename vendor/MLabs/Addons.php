@@ -7,7 +7,7 @@ class Addons {
     // new addons should added manually in composer.json for new updates
     // this should only use for new installs of silverstripe projects
     // consider that the sort order is reversed in composer.json is the last on first
-    private static $require = array(
+    private static $requires = array(
         '       "hpmewes/silverstripe-googlemaps": "dev-master"',
         '       "hpmewes/silverstripe-facebookconnect": "dev-master",',
         '       "hpmewes/silverstripe-gallery": "1.*@dev",',
@@ -21,8 +21,25 @@ class Addons {
         '       "silverstripe/userforms": "*",'
     );
     
+    private static $extensions = array(
+        'BootstrapForms',
+        'FacebookConnect'
+    );
+
+    /**
+     * add extension for custom configs, templates or classes to a addon which should not git controlled
+     * because the files where copied from installer template to silverstripe folders
+     */
+    public static function addExtensions() {
+        foreach(self::$extensions as $extension) {
+            $extensionClass = "\MLabs\\".$extension."Extension";
+
+            $extensionClass::add();
+        }
+    }
+    
     public static function getRequire() {
-        return self::$require;
+        return self::$requires;
     }
     
 }
