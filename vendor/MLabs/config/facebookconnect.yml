@@ -1,0 +1,7 @@
+FacebookControllerExtension:
+  app_id: '[app_id]'
+  api_secret: '[api_secret]'
+  create_member: true
+  member_groups:
+    - 'facebook_members'
+  sync_member_details: true
