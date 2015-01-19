@@ -1,0 +1,8 @@
+BootstrapForm:
+   bootstrap_included: false
+   jquery_included:    true
+   
+BootstrapFormMemberProfilePage_Controller:
+    extensions:
+        - 'BootstrapMemberProfileForm'
+        - 'BootstrapMemberRegisterForm'
