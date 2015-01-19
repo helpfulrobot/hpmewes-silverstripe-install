@@ -110,10 +110,10 @@ class Installer {
         self::checkSystemRequirements();
         
         self::moveFiles($update);
-        self::changeOwner();
         
         // not neede in update mode
         if(!$update) {
+            self::changeOwner();
             self::executableUserRights();
             
             self::getConfig();
@@ -276,6 +276,8 @@ class Installer {
         
         // add some customized extensions to addons
         Addons::addExtensions(self::$event);
+        
+        self::changeOwner();
     }
 
     /**
