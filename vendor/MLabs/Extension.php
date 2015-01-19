@@ -8,13 +8,17 @@ class Extension implements IExtension {
      */
     public static function add() {
         File::copy(Installer::getRootDirVendor().static::getExtension(), Installer::getRootDirConfig());
+        Installer::getComposerEvent()->getIO()->write(":: copied ".self::getConfigfile());
         
         foreach(static::getClasses() as $folder => $class) {
             File::copy(Installer::getRootDirVendor().$class, Installer::getRootDirCode().$folder."/");
+            Installer::getComposerEvent()->getIO()->write(":: added class $class");
         }
 
         foreach(static::getTemplates() as $folder => $template) {
             File::copy(Installer::getRootDirVendor().$template, Installer::getRootDirTheme().$folder."/");
+            
+            Installer::getComposerEvent()->getIO()->write(":: added template $template");
         }
     }
     
