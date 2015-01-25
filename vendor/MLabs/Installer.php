@@ -11,7 +11,7 @@ class Installer {
     private static $version                 = "0.1";
     private static $version_silverstripe    = "3.1.8";
     
-    private static $config_from = "file";  // cli | file | database
+    private static $config_from = "cli";  // cli | file | database
     
     /**
      * silverstripe filestructure
