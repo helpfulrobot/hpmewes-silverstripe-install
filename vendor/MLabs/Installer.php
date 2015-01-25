@@ -333,7 +333,7 @@ class Installer {
      * prevent $. is not defined
      */
     protected static function requirementsGoogleJquery() {
-        $version = self::$event->getIO()->ask(":: type jquery version here (let empty for default 2.1.1): ", "2.1.1");
+        $version = self::$event->getIO()->ask(":: type jquery version here (let empty for default 2.1.3): ", "2.1.3");
         
         File::addContent(
             self::$config_silverstripe_old, 
@@ -345,7 +345,7 @@ class Installer {
      * add Requirements:: for bootstrap from cdn
      */
     protected static function requirementsCDNBootstrap() {
-        $version = self::$event->getIO()->ask(":: type bootstrap version here (let empty for default 3.3.1): ", "3.3.1");
+        $version = self::$event->getIO()->ask(":: type bootstrap version here (let empty for default 3.3.2): ", "3.3.2");
         
         File::addContent(
             self::$root_dir_code.'Page.php', 
