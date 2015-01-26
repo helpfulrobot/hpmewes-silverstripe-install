@@ -30,6 +30,10 @@
         {
         "type": "vcs",
         "url": "git@github.com:hpmewes/silverstripe-siteconfigextension.git"
+        },
+        {
+        "type": "vcs",
+        "url": "git@github.com:hpmewes/silverstripe-bootstrap-forms.git"
         }
     ],
     "require": {
