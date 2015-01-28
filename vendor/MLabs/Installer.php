@@ -136,6 +136,7 @@ class Installer {
             self::requirementsGoogleJquery();
             self::blockRequirements();
             self::requirementsCDNBootstrap();
+            self::requirementsJqueryChosen();
             self::addMeta();
             
             self::resetUserRights();
