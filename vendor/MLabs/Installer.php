@@ -11,7 +11,7 @@ class Installer {
     private static $version                 = "0.1";
     private static $version_silverstripe    = "3.1.8";
     
-    private static $config_from = "cli";  // cli | file | database
+    private static $config_from = "file";  // cli | file | database
     
     /**
      * silverstripe filestructure
@@ -110,6 +110,7 @@ class Installer {
         self::checkSystemRequirements();
         
         self::moveFiles($update);
+        self::copyFiles($update);
         
         // not neede in update mode
         if(!$update) {
@@ -230,6 +231,8 @@ class Installer {
     /**
      * move the silverstripe-installer from vendor to project root
      * and delete directory structure in vendor
+     * 
+     * @param boolean $update
      */
     protected static function moveFiles($update) {
         $root_dir_silverstripe_installer = "vendor/silverstripe/installer";
@@ -251,6 +254,19 @@ class Installer {
             // remove the folder
             File::deleteFolder("vendor/silverstripe");
         }
+    }
+    
+    /**
+     * copy some files
+     * 
+     * @param boolean $update
+     */
+    protected function copyFiles($update) {
+        File::copy(self::getRootDirVendor().'css/*.css', self::getRootDirTheme().'css');
+        File::copy(self::getRootDirVendor().'js/*.js', self::getRootDirTheme().'js');
+        File::copy(self::getRootDirVendor().'images/*.*', self::getRootDirTheme().'images');
+        
+        self::$event->getIO()->write(":: copied some needed files");
     }
 
     /**
@@ -324,7 +340,12 @@ class Installer {
         File::addContent(
             self::$root_dir_code.'Page.php', 
             "                Requirements::block(THIRDPARTY_DIR . '/jquery/jquery.js');", 
-            "// See:"
+            "http://doc.silverstripe.org/framework/en/reference/requirements"
+        );
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
+            "                Requirements::block(FRAMEWORK_DIR . '/admin/thirdparty/chosen/chosen/chosen.jquery.js');", 
+            "/jquery/jquery.js"
         );
     }
 
@@ -341,6 +362,20 @@ class Installer {
         );
     }
     
+    protected static function requirementsJqueryChosen() {
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
+            "                Requirements::javascript(THEMES_DIR.'/'. SSViewer::current_theme().'/js/jquery.chosen.min.js');", 
+            'bootstrap.min.js'
+        );
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
+            "                Requirements::themedCSS('jquery.chosen.min');", 
+            'bootstrap-theme.min.css'
+        );
+    }
+
+
     /**
      * add Requirements:: for bootstrap from cdn
      */
