@@ -37,7 +37,7 @@
         }
     ],
     "require": {
-        "silverstripe/installer": "3.1.8"
+        "silverstripe/installer": "3.1.12"
     },
     "config": {
         "process-timeout": 600	
