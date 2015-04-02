@@ -9,7 +9,7 @@ class Installer {
      * installer settings
      */
     private static $version                 = "0.1";
-    private static $version_silverstripe    = "3.1.8";
+    private static $version_silverstripe    = "3.1.12";
     
     private static $config_from = "file";  // cli | file | database
     
@@ -65,10 +65,6 @@ class Installer {
     
     private static $domain              = "[domain]";              // domain for project
     private static $froxlor_username    = "[froxlor_username]";    // client username in froxlor
-    
-    // register your website / app https://developers.facebook.com/apps/?action=create
-    private static $facebook_app_id     = "[app_id]";       // app id of facebook app
-    private static $facebook_api_secret = "[api_secret]";   // app secret of facebook app
 
     private static $event   = null;
     
@@ -96,9 +92,6 @@ class Installer {
     public static function getRootDirTheme() { return self::$root_dir_theme; }
     public static function getRootDirConfig() { return self::$root_dir_config; }
     public static function getRootDirVendor() { return self::$root_dir_vendor; }
-    
-    public static function getFacebookAppId() { return self::$facebook_app_id; }
-    public static function getFacebookApiSecret() { return self::$facebook_api_secret; }
     
     /**
      * task handler with install or update mode
@@ -286,7 +279,7 @@ class Installer {
         foreach(Addons::getRequire() as $require) {
             File::addContent(self::$config_composer, $require, 'silverstripe/installer');
         }
-        File::replaceContent(self::$config_composer, '"silverstripe/installer": "3.1.8"', '"silverstripe/installer": "3.1.8",');
+        File::replaceContent(self::$config_composer, '"silverstripe/installer": "3.1.11"', '"silverstripe/installer": "3.1.11",');
         
         // run composer again which triggered Installer.php again
         passthru("composer update");
