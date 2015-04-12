@@ -107,10 +107,11 @@ class Installer {
         
         // not neede in update mode
         if(!$update) {
+            self::getConfig();
+            
             self::changeOwner();
             self::executableUserRights();
             
-            self::getConfig();
             // some config settings
             self::addEnvironmentSettings();
             
@@ -172,6 +173,8 @@ class Installer {
     protected static function getConfigFromCommandline() {
         self::$domain = self::$event->getIO()->ask(":: type the domain here without http:// or https:// (let empty for default placeholder [domain]): ", "[domain]");
         self::$froxlor_username = self::$event->getIO()->ask(":: type the client username which added to froxlor here (let empty for default placeholder [froxlor-username]): ", "[froxlor-username]");
+        self::$owner_user_web = self::$event->getIO()->ask(":: type the www user here (let empty for default ".self::$froxlor_username.": ", self::$froxlor_username);
+        self::$owner_group_web = self::$event->getIO()->ask(":: type the www group here (let empty for default ".self::$froxlor_username.": ", self::$froxlor_username);
         self::$project_database_server = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [localhost]): ", "localhost");
         self::$project_database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
         self::$project_database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
@@ -206,7 +209,7 @@ class Installer {
      */
     protected static function changeOwner() {
         // change owner for project recursiv
-        exec("chown ".self::$owner_user_web.":".self::$owner_group_web." ".self::$root_dir_web."  -R");
+        exec("chown ".self::$owner_user_web.":".self::$owner_group_web." ".self::$root_dir_web.self::$froxlor_username."  -R");
         self::$event->getIO()->write(":: make domain readable for www");      
     }
 
