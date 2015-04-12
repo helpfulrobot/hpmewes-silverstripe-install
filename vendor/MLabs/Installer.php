@@ -282,7 +282,7 @@ class Installer {
         foreach(Addons::getRequire() as $require) {
             File::addContent(self::$config_composer, $require, 'silverstripe/installer');
         }
-        File::replaceContent(self::$config_composer, '"silverstripe/installer": "3.1.11"', '"silverstripe/installer": "3.1.11",');
+        File::replaceContent(self::$config_composer, '"silverstripe/installer": "3.1.12"', '"silverstripe/installer": "3.1.12",');
         
         // run composer again which triggered Installer.php again
         passthru("composer update");
