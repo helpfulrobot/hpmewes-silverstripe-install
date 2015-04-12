@@ -255,7 +255,7 @@ class Installer {
      * 
      * @param boolean $update
      */
-    protected function copyFiles($update) {
+    protected static function copyFiles($update) {
         File::copy(self::getRootDirVendor().'css/*.css', self::getRootDirTheme().'css');
         File::copy(self::getRootDirVendor().'js/*.js', self::getRootDirTheme().'js');
         File::copy(self::getRootDirVendor().'images/*.*', self::getRootDirTheme().'images');
