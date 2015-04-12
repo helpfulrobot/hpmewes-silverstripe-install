@@ -9,6 +9,8 @@ class Installer {
      * installer settings
      */
     private static $version                 = "0.1";
+    private static $version_jquery          = "2.1.3";
+    private static $version_bootstrap       = "3.3.4";
     private static $version_silverstripe    = "3.1.12";
     
     private static $config_from = "cli";  // cli | file | database
@@ -351,11 +353,11 @@ class Installer {
      * prevent $. is not defined
      */
     protected static function requirementsGoogleJquery() {
-        $version = self::$event->getIO()->ask(":: type jquery version here (let empty for default 2.1.3): ", "2.1.3");
+        self::$version_jquery = self::$event->getIO()->ask(":: type jquery version here (let empty for default ".self::$version_jquery."): ", self::$version_jquery);
         
         File::addContent(
             self::$config_silverstripe_old, 
-            "Requirements::javascript('http://ajax.googleapis.com/ajax/libs/jquery/$version/jquery.min.js');"
+            "Requirements::javascript('http://ajax.googleapis.com/ajax/libs/jquery/".self::$version_jquery."/jquery.min.js');"
         );
     }
     
@@ -377,21 +379,21 @@ class Installer {
      * add Requirements:: for bootstrap from cdn
      */
     protected static function requirementsCDNBootstrap() {
-        $version = self::$event->getIO()->ask(":: type bootstrap version here (let empty for default 3.3.2): ", "3.3.2");
+        self::$version_bootstrap = self::$event->getIO()->ask(":: type bootstrap version here (let empty for default ".self::$version_bootstrap."): ", self::$version_bootstrap);
         
         File::addContent(
             self::$root_dir_code.'Page.php', 
-            "                Requirements::javascript('https://maxcdn.bootstrapcdn.com/bootstrap/$version/js/bootstrap.min.js');", 
+            "                Requirements::javascript('https://maxcdn.bootstrapcdn.com/bootstrap/".self::$version_bootstrap."/js/bootstrap.min.js');", 
             'Requirements::block'
         );
         File::addContent(
             self::$root_dir_code.'Page.php', 
-            "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/$version/css/bootstrap-theme.min.css');", 
+            "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/".self::$version_bootstrap."/css/bootstrap-theme.min.css');", 
             'Requirements::block'
         );
         File::addContent(
             self::$root_dir_code.'Page.php', 
-            "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/$version/css/bootstrap.min.css');", 
+            "                Requirements::css('https://maxcdn.bootstrapcdn.com/bootstrap/".self::$version_bootstrap."/css/bootstrap.min.css');", 
             'Requirements::block'
         );
     }
