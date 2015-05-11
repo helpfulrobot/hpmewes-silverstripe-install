@@ -61,7 +61,7 @@ class Installer {
     private static $project_database_name     = "[database_name]";
     private static $project_database_username = "[database_username]";
     private static $project_database_password = "[database_password]";
-    private static $project_environment_type  = "live";
+    private static $project_environment_type  = "dev";
     private static $default_admin_username    = "admin";
     private static $default_admin_password    = "[default_admin_password]";
     
@@ -181,7 +181,7 @@ class Installer {
         self::$project_database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
         self::$project_database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
         self::$project_database_password = self::$event->getIO()->ask(":: type the database password here (let empty for default placeholder [database_password]): ", "[database_password]");
-        self::$project_environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [live]): ", "live");
+        self::$project_environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [".$project_environment_type."]): ", $project_environment_type);
         self::$default_admin_username = self::$event->getIO()->ask(":: type the default admin username here (let empty for default placeholder [admin]): ", "admin");
         self::$default_admin_password = self::$event->getIO()->ask(":: type the default admin password here (let empty for default placeholder [12345]): ", "12345");
     }
