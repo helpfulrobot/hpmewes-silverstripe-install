@@ -9,7 +9,7 @@ class Installer {
      * installer settings
      */
     private static $version                 = "0.1";
-    private static $version_jquery          = "2.1.3";
+    private static $version_jquery          = "2.1.4";
     private static $version_bootstrap       = "3.3.4";
     private static $version_silverstripe    = "3.1.12";
     
