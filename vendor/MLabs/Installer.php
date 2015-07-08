@@ -180,7 +180,7 @@ class Installer {
         self::$froxlor_username = self::$event->getIO()->ask(":: type the client username which added to froxlor here (let empty for default placeholder [froxlor-username]): ", "[froxlor-username]");
         self::$owner_user_web = self::$event->getIO()->ask(":: type the www user here (let empty for default ".self::$froxlor_username.": ", self::$froxlor_username);
         self::$owner_group_web = self::$event->getIO()->ask(":: type the www group here (let empty for default ".self::$froxlor_username.": ", self::$froxlor_username);
-        self::$project_database_server = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [localhost]): ", "localhost");
+        self::$project_database_server = self::$event->getIO()->ask(":: type the database server here (let empty for default placeholder [localhost]): ", "localhost");
         self::$project_database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
         self::$project_database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
         self::$project_database_password = self::$event->getIO()->ask(":: type the database password here (let empty for default placeholder [database_password]): ", "[database_password]");
