@@ -10,9 +10,10 @@ class Installer {
      */
     private static $version                 = "0.1";
     private static $version_jquery          = "2.1.4";
-    private static $version_bootstrap       = "3.3.4";
+    private static $version_bootstrap       = "3.3.5";
     private static $version_silverstripe    = "3.1.12";
     
+    // only command line (cli) supported at moment
     private static $config_from = "cli";  // cli | file | database
     
     /**
@@ -24,8 +25,9 @@ class Installer {
      * code/controllers
      * templates/Forms
      */
-    private static $root_dir_code       = "mysite/code/";               // root directory of mysite
-    private static $root_dir_theme      = "themes/simple/templates/";   // root directory for standard theme
+    private static $root_dir_code           = "mysite/code/";               // root directory of mysite
+    private static $root_dir_theme          = "themes/";                    // root directory for themes
+    private static $root_dir_default_theme  = "themes/simple/templates/";   // root directory for standard theme
     
     private static $root_dir_config     = "mysite/_config/";            // root directory for config
     private static $root_dir_vendor     = "vendor/MLabs/";              // root directory for MLabs vendor
@@ -91,7 +93,7 @@ class Installer {
     public static function getComposerEvent() { return self::$event; }
     
     public static function getRootDirCode() { return self::$root_dir_code; }
-    public static function getRootDirTheme() { return self::$root_dir_theme; }
+    public static function getRootDirTheme() { return self::$root_dir_default_theme; }
     public static function getRootDirConfig() { return self::$root_dir_config; }
     public static function getRootDirVendor() { return self::$root_dir_vendor; }
     
@@ -129,6 +131,7 @@ class Installer {
             // silverstripe cms changes
             self::addConfigErrorLog();
             self::addConfigEmailLog();
+            self::addControllerVars();
             self::requirementsGoogleJquery();
             self::blockRequirements();
             self::requirementsCDNBootstrap();
@@ -181,7 +184,7 @@ class Installer {
         self::$project_database_name = self::$event->getIO()->ask(":: type the database name here (let empty for default placeholder [SS_mysite]): ", "SS_mysite");
         self::$project_database_username = self::$event->getIO()->ask(":: type the database user name here (let empty for default placeholder [database_username]): ", "[database_username]");
         self::$project_database_password = self::$event->getIO()->ask(":: type the database password here (let empty for default placeholder [database_password]): ", "[database_password]");
-        self::$project_environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [".$project_environment_type."]): ", $project_environment_type);
+        self::$project_environment_type = self::$event->getIO()->ask(":: type the environment type here dev|test|live (let empty for default placeholder [".self::$project_environment_type."]): ", self::$project_environment_type);
         self::$default_admin_username = self::$event->getIO()->ask(":: type the default admin username here (let empty for default placeholder [admin]): ", "admin");
         self::$default_admin_password = self::$event->getIO()->ask(":: type the default admin password here (let empty for default placeholder [12345]): ", "12345");
     }
@@ -219,11 +222,26 @@ class Installer {
      * create a default folder structure for projects
      */
     protected static function createFolderStructure() {
+        // code structure
         exec("mkdir ".self::$root_dir_code."forms");
         exec("mkdir ".self::$root_dir_code."extensions");
         exec("mkdir ".self::$root_dir_code."dataobjects");
         exec("mkdir ".self::$root_dir_code."controllers");
-        exec("mkdir ".self::$root_dir_theme."Forms");
+        
+        // new theme structure
+        // replace .de .com .org - from domainname with regex
+        exec("mkdir ".self::$root_dir_theme.self::$domain);
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/css');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/images');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/fonts');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/js');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/templates');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/templates/Forms');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/templates/Includes');
+        exec("mkdir ".self::$root_dir_theme.self::$domain.'/templates/Layout');
+        
+        // adding some to default theme structure
+        exec("mkdir ".self::$root_dir_default_theme."Forms");
         self::$event->getIO()->write(":: create default folder structure for projects");
     }
 
@@ -261,9 +279,9 @@ class Installer {
      * @param boolean $update
      */
     protected static function copyFiles($update) {
-        File::copy(self::getRootDirVendor().'css/*.css', self::getRootDirTheme().'css');
-        File::copy(self::getRootDirVendor().'js/*.js', self::getRootDirTheme().'js');
-        File::copy(self::getRootDirVendor().'images/*.*', self::getRootDirTheme().'images');
+        File::copy(self::getRootDirVendor().'css/*.css', self::getRootDirTheme().'css/');
+        File::copy(self::getRootDirVendor().'js/*.js', self::getRootDirTheme().'js/');
+        File::copy(self::getRootDirVendor().'images/*.*', self::getRootDirTheme().'images/');
         
         self::$event->getIO()->write(":: copied some needed files");
     }
@@ -311,6 +329,25 @@ class Installer {
     }
 
     /**
+     * add some usefull controller vars
+     */
+    protected static function addControllerVars() {
+        // add a variable $theme_dir to controller to avoid long syntax
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
+            'protected $theme_dir;',
+            "class Page_Controller extends ContentController {"
+        );
+        
+        File::addContent(
+            self::$root_dir_code.'Page.php', 
+            '$this->theme_dir = Config::inst()->get("SSViewer", "theme");',
+            "parent::init();"
+        );
+    }
+
+
+    /**
      * adding warn and error log to silverstripe _config.php
      */
     protected static function addConfigErrorLog() {
@@ -328,7 +365,7 @@ class Installer {
         self::$event->getIO()->write(":: add email logging to Silverstripe _config.php");
         File::addContent(
             self::$config_silverstripe_old, 
-            "SS_Log::add_writer(new SS_LogEmailWriter('admin@".self::$domain."'), SS_Log::WARN, '<=');"
+            "SS_Log::add_writer(new SS_LogEmailWriter('".self::$project_company_email."'), SS_Log::WARN, '<=');"
         );
     }
     
@@ -404,12 +441,12 @@ class Installer {
     protected static function addMeta() {
         // Todo: compan_* variables from command line otherwise use this one
         File::addContent(
-            self::$root_dir_theme.'Page.ss', 
+            self::$root_dir_default_theme.'Page.ss', 
             '       <meta name="author" content="'.self::$project_company.', '.self::$project_company_adress.', '.self::$project_company_destination.', '.self::$project_company_web.', '.self::$project_company_email.'">', 
             '<meta http-equiv'
         );
         File::replaceContent(
-            self::$root_dir_theme.'Page.ss',
+            self::$root_dir_default_theme.'Page.ss',
             '$MetaTags(false)',
             '$MetaTags(true)'
         );
