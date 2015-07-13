@@ -25,11 +25,11 @@
         },
         {
         "type": "vcs",
-        "url": "git@github.com:hpmewes/silverstripe-facebookconnect.git"
+        "url": "git@github.com:hpmewes/silverstripe-googlesitemaps.git"
         },
         {
         "type": "vcs",
-        "url": "git@github.com:hpmewes/silverstripe-siteconfigextension.git"
+        "url": "git@github.com:hpmewes/silverstripe-facebookconnect.git"
         },
         {
         "type": "vcs",
