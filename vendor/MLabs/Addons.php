@@ -9,10 +9,12 @@ class Addons {
     // consider that the sort order is reversed in composer.json is the last on first
     private static $requires = array(
         '       "hpmewes/silverstripe-googlemaps": "dev-master"',
+        '       "hpmewes/silverstripe-googlesitemaps": "dev-master"',
         '       "hpmewes/silverstripe-facebookconnect": "dev-master",',
         '       "hpmewes/silverstripe-gallery": "1.*@dev",',
         '       "hpmewes/silverstripe-siteconfigextension": "dev-master",',
         '       "hpmewes/silverstripe-bootstrap-forms": "dev-master",',
+        '       "jonom/silverstripe-focuspoint": "dev-master",',
         '       "gdmedia/silverstripe-frontend-admin": "dev-master",',
         '       "unclecheese/kickassets": "dev-master",',
         '       "unclecheese/zen-fields": "dev-master",',
@@ -23,7 +25,8 @@ class Addons {
     
     private static $extensions = array(
         'BootstrapForms',
-        'FacebookConnect'
+        'FacebookConnect',
+        'GoogleSitemap'
     );
 
     /**
