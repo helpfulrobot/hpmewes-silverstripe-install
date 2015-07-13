@@ -14,7 +14,7 @@ class Addons {
         '       "hpmewes/silverstripe-gallery": "1.*@dev",',
         '       "hpmewes/silverstripe-siteconfigextension": "dev-master",',
         '       "hpmewes/silverstripe-bootstrap-forms": "dev-master",',
-        '       "jonom/silverstripe-focuspoint": "dev-master",',
+        '       "hpmewes/silverstripe-focuspoint": "dev-master",',
         '       "gdmedia/silverstripe-frontend-admin": "dev-master",',
         '       "unclecheese/kickassets": "dev-master",',
         '       "unclecheese/zen-fields": "dev-master",',
