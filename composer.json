@@ -21,6 +21,10 @@
         },
         {
         "type": "vcs",
+        "url": "git@github.com:hpmewes/silverstripe-focuspoint.git"
+        },
+        {
+        "type": "vcs",
         "url": "git@github.com:hpmewes/silverstripe-googlemaps.git"
         },
         {
